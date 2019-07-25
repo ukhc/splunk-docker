@@ -18,10 +18,21 @@ Deploy (run these commands from the root folder of this repo)
 mkdir -p /Users/Shared/Kubernetes/persistent-volumes/splunk
 kubectl apply -f ./kubernetes/splunk-local-pv.yaml
 kubectl apply -f ./kubernetes/splunk.yaml
-open http://127.0.0.1
 ~~~
 
-Note: The default admin password is admin
+See the status of the pods
+~~~
+kubectl get pods
+kubectl describe pods
+kubectl logs SPLUNKPODNAME
+~~~
+
+open it in a browser
+~~~
+open http://127.0.0.1:8000
+~~~
+
+Note: The default admin password is adminadmin
 
 Delete
 ~~~
