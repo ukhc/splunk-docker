@@ -73,20 +73,20 @@ spec:
           value: http://company.com/path/to/app.tgz
         livenessProbe:
           httpGet:
-            path: /index.php
+            path: /en-US/account/login?loginType=splunk
             port: http
           initialDelaySeconds: 15
           timeoutSeconds: 5
           successThreshold: 1
-          failureThreshold: 1
+          failureThreshold: 3
         readinessProbe:
           httpGet:
-            path: /index.php
+            path: /en-US/account/login?loginType=splunk
             port: http
           initialDelaySeconds: 5
           timeoutSeconds: 1
           successThreshold: 1
-          failureThreshold: 1
+          failureThreshold: 3
         ports:
         - containerPort: 80
           name: default
