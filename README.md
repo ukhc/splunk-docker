@@ -40,3 +40,43 @@ kubectl delete -f ./kubernetes/splunk.yaml
 kubectl delete -f ./kubernetes/splunk-local-pv.yaml
 rm -rf /Users/Shared/Kubernetes/persistent-volumes/splunk
 ~~~
+
+## How to override values in the Kubernetes deployment
+
+### Use this pattern in a script
+~~~
+# copy the file to a temp file
+cp ./kubernetes/splunk.yaml yaml.tmp
+
+# replace the values with sed in the temp file
+sed -i '' 's/storage:.*/storage: default/' yaml.tmp
+
+# deploy from the temp file
+kubectl apply yaml.tmp
+
+# delete the temp file
+rm -f yaml.tmp
+~~~
+
+### Values to override
+
+storage: 5Gi (the size of the persistent volume claim)
+~~~
+sed -i '' 's/storage:.*/storage: 20Gi/' yaml.tmp
+~~~
+
+password: YWRtaW5hZG1pbg==  (the password for the splunk admin account)
+~~~
+# base64 encode the password, use the result in the sed
+echo -n admin | base64
+
+sed -i '' 's/password:.*/password: Base64EncodedPassword/' yaml.tmp
+
+# base64 decode the password, if you need to see what it is
+echo YWRtaW5hZG1pbg== | base64 --decode
+~~~
+
+storageClassName: splunk-storage  (if you're deploying to a cloud provider, look at what they offer)
+~~~
+sed -i '' 's/storageClassName:.*/storageClassName: managed-premium/' yaml.tmp
+~~~
