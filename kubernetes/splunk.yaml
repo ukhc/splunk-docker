@@ -1,0 +1,99 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: splunk-pv-claim
+  labels:
+    app: splunk
+spec:
+  storageClassName: splunk-storage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: splunk
+  labels:
+    app: splunk
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: splunk
+  type: LoadBalancer
+  
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: splunk-admin-secret
+type: Opaque
+data:
+  password: YWRtaW4=
+  
+---
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: splunk
+  labels:
+    app: splunk
+spec:
+  selector:
+    matchLabels:
+      app: splunk
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: splunk
+    spec:
+      containers:
+      - image: store/splunk/splunk:7.3
+        name: splunk
+        env:
+        - name: SPLUNK_START_ARGS
+          value: --accept-license
+        - name: SPLUNK_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: splunk-admin-secret
+              key: password
+        - name: SPLUNK_HEC_TOKEN
+          value: abcd1234
+        - name: SPLUNK_APPS_URL
+          value: http://company.com/path/to/app.tgz
+        livenessProbe:
+          httpGet:
+            path: /index.php
+            port: http
+          initialDelaySeconds: 15
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 1
+        readinessProbe:
+          httpGet:
+            path: /index.php
+            port: http
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+          successThreshold: 1
+          failureThreshold: 1
+        ports:
+        - containerPort: 80
+          name: default
+        volumeMounts:
+        - name: splunk-persistent-storage
+          mountPath: /opt/splunk/etc
+      volumes:
+      - name: splunk-persistent-storage
+        persistentVolumeClaim:
+          claimName: splunk-pv-claim
