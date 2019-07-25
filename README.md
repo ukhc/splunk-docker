@@ -4,6 +4,11 @@
 - https://hub.docker.com/_/splunk-enterprise
 - https://github.com/splunk/docker-splunk
 
+## Docker deployment to the local workstation
+
+~~~
+docker run -d -p 8000:8000 -e 'SPLUNK_START_ARGS=--accept-license' -e 'SPLUNK_PASSWORD=<password>' store/splunk/splunk:7.3
+~~~
 
 ## Kubernetes deployment to the local workstation (macOS only)
 
