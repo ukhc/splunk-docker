@@ -57,7 +57,7 @@ spec:
         app: splunk
     spec:
       containers:
-      - image: store/splunk/splunk:7.3
+      - image: splunk/splunk:7.3
         name: splunk
         env:
         - name: SPLUNK_START_ARGS
